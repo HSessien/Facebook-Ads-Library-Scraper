@@ -1,6 +1,56 @@
 # ============================================
-# FICHIER 5 : requirements.txt
+# Facebook Ads Library Scraper
+# Fichier de dépendances Python
 # ============================================
+
+# Interface utilisateur Streamlit
 streamlit>=1.28.0
+
+# Scraping avec Playwright (pour Windows/Linux/Mac)
 playwright>=1.40.0
+
+# Alternative pour Android/Termux (décommenter si nécessaire)
+# selenium>=4.15.0
+# webdriver-manager>=4.0.0
+
+# Manipulation de données
 pandas>=2.0.0
+
+# Gestion des boucles asyncio imbriquées
+nest-asyncio>=1.5.0
+
+# Planification de tâches (veille automatique)
+schedule>=1.2.0
+
+# Export Excel (optionnel, si besoin d'exporter en XLSX)
+openpyxl>=3.1.0
+
+supabase
+python-dotenv
+
+# ============================================
+# Dépendances optionnelles
+# ============================================
+
+# Google Drive API (si utilisation de l'API Python)
+# google-api-python-client>=2.100.0
+# google-auth-httplib2>=0.1.1
+# google-auth-oauthlib>=1.1.0
+
+# ============================================
+# Notes d'installation
+# ============================================
+
+# WINDOWS / LINUX / MAC :
+# pip install -r requirements.txt
+# playwright install chromium
+# playwright install-deps
+
+# ANDROID / TERMUX :
+# pkg update && pkg upgrade
+# pkg install python chromium
+# pip install -r requirements.txt
+# Commentez "playwright" et décommentez "selenium" et "webdriver-manager"
+
+# GOOGLE DRIVE (optionnel) :
+# Décommentez les lignes google-* si vous voulez utiliser l'API Drive
