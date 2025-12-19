@@ -5,6 +5,12 @@ from playwright.async_api import async_playwright
 import pandas as pd
 import json
 import os
+from supabase_db import (
+    load_blacklist, save_blacklist,
+    load_whitelist, save_whitelist,
+    load_history, add_to_history, update_history_incrementally,
+    load_config, save_config
+)
 import sys
 import time
 import random
@@ -177,51 +183,6 @@ def save_config(config):
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2)
 
-def load_blacklist():
-    """Charge la blacklist depuis le JSON"""
-    if os.path.exists(BLACKLIST_FILE):
-        try:
-            with open(BLACKLIST_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_blacklist(blacklist):
-    """Sauvegarde la blacklist dans le JSON"""
-    with open(BLACKLIST_FILE, 'w', encoding='utf-8') as f:
-        json.dump(blacklist, f, indent=2, ensure_ascii=False)
-
-def load_whitelist():
-    """Charge la whitelist depuis le JSON"""
-    if os.path.exists(WHITELIST_FILE):
-        try:
-            with open(WHITELIST_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_whitelist(whitelist):
-    """Sauvegarde la whitelist dans le JSON"""
-    with open(WHITELIST_FILE, 'w', encoding='utf-8') as f:
-        json.dump(whitelist, f, indent=2, ensure_ascii=False)
-
-def load_history():
-    """Charge l'historique des scraping"""
-    if os.path.exists(HISTORY_FILE):
-        try:
-            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_history(history):
-    """Sauvegarde l'historique des scraping"""
-    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
-        json.dump(history, f, indent=2, ensure_ascii=False)
-
 def load_daily_reports():
     """Charge les rapports journaliers de veille concurrentielle"""
     if os.path.exists(DAILY_REPORT_FILE):
@@ -256,52 +217,6 @@ def clear_scraping_state():
     """Efface l'état du scraping"""
     if os.path.exists(SCRAPING_STATE_FILE):
         os.remove(SCRAPING_STATE_FILE)
-
-def add_to_history(query_info, results_count, results_data, url=None, status="success", error_message=None, entry_id=None):
-    """Ajoute ou met à jour une entrée dans l'historique"""
-    history = load_history()
-    
-    # Si un ID est fourni, chercher et mettre à jour l'entrée existante
-    if entry_id:
-        for i, entry in enumerate(history):
-            if entry.get('id') == entry_id:
-                history[i]['results_count'] = results_count
-                history[i]['results'] = results_data
-                history[i]['status'] = status
-                if error_message:
-                    history[i]['error_message'] = error_message
-                save_history(history)
-                return entry_id
-    
-    # Sinon créer une nouvelle entrée
-    new_id = entry_id or datetime.now().strftime('%Y%m%d_%H%M%S')
-    entry = {
-        "id": new_id,
-        "date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        "query": query_info,
-        "results_count": results_count,
-        "results": results_data,
-        "status": status,
-        "error_message": error_message
-    }
-    
-    if url:
-        entry["url"] = url
-    
-    history.insert(0, entry)
-    save_history(history)
-    return new_id
-
-def update_history_incrementally(entry_id, new_results):
-    """Met à jour progressivement une entrée d'historique avec de nouveaux résultats"""
-    history = load_history()
-    for i, entry in enumerate(history):
-        if entry.get('id') == entry_id:
-            history[i]['results'].extend(new_results)
-            history[i]['results_count'] = len(history[i]['results'])
-            save_history(history)
-            return True
-    return False
 
 def get_permanent_id_from_script(page_profile_id, list_type, headless=True):
     """
@@ -1157,7 +1072,6 @@ def run_scraping_task(country, status, media_type, search_term, date_filter, bla
 
 # ============================================
 # INTÉGRATION VEILLE CONCURRENTIELLE
-# À ajouter dans scraper.py
 # ============================================
 
 def launch_competitive_intelligence():
