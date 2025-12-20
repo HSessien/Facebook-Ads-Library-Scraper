@@ -1319,7 +1319,7 @@ if st.session_state.current_page == "history":
                     
                     with col1:
                         st.subheader("ℹ️ Informations de la requête")
-                        st.json(entry['query'])
+                        st.json(entry.get('query', {}))
                     
                     with col2:
                         st.metric("Résultats obtenus", entry['results_count'])
