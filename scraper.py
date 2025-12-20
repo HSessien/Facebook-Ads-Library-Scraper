@@ -1304,13 +1304,14 @@ if st.session_state.current_page == "history":
             # Afficher l'historique (CODE EXISTANT - INCHANGÉ)
             for entry in filtered_history:
                 # Afficher le nom du pays
-                if 'countries' in entry['query']:
-                    # Multi-pays
-                    countries_display = ', '.join(entry['query']['countries'])
-                else:
-                    # Ancien format (compatibilité)
-                    country_code = entry['query'].get('country_code', 'N/A')
+                query = entry.get('query', {})
+                if query and 'countries' in query:
+                    countries_display = ', '.join(query['countries'])
+                elif query and 'country_code' in query:
+                    country_code = query.get('country_code', 'N/A')
                     countries_display = COUNTRY_NAMES.get(country_code, country_code)
+                else:
+                    countries_display = 'N/A'
                 
                 with st.expander(f"🗓️ {entry['date']} - {entry['results_count']} résultats - {countries_display} - {entry.get('status', 'unknown')}"):
                     
